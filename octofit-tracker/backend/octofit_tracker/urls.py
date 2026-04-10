@@ -19,6 +19,8 @@ from rest_framework import routers
 from . import views
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+import os
 from rest_framework.reverse import reverse
 
 router = routers.DefaultRouter()
@@ -31,13 +33,20 @@ router.register(r'leaderboard', views.LeaderboardViewSet)
 
 @api_view(['GET'])
 def api_root(request, format=None):
+    # Use $CODESPACE_NAME to build the public URL if available
+    codespace_name = os.environ.get('CODESPACE_NAME')
+    if codespace_name:
+        base_url = f"https://{codespace_name}-8000.app.github.dev/api/"
+    else:
+        # fallback to localhost for local dev
+        base_url = "http://localhost:8000/api/"
     return Response({
-        'users': reverse('user-list', request=request, format=format),
-        'teams': reverse('team-list', request=request, format=format),
-        'profiles': reverse('profile-list', request=request, format=format),
-        'activities': reverse('activity-list', request=request, format=format),
-        'workouts': reverse('workout-list', request=request, format=format),
-        'leaderboard': reverse('leaderboard-list', request=request, format=format),
+        'users': base_url + 'users/',
+        'teams': base_url + 'teams/',
+        'profiles': base_url + 'profiles/',
+        'activities': base_url + 'activities/',
+        'workouts': base_url + 'workouts/',
+        'leaderboard': base_url + 'leaderboard/',
     })
 
 urlpatterns = [
